@@ -1,0 +1,10 @@
+/.env
+/tags*
+/mysql
+/www/php82/*
+/reverse/servers/*.test.conf
+/reverse/ssl/*.crt
+/reverse/ssl/*.key
+/php82/sites-available/*.test.conf
+/php82/nginx/ssl/*.crt
+/php82/nginx/ssl/*.key

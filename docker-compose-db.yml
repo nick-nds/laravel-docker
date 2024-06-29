@@ -1,0 +1,36 @@
+services:
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    container_name: redis
+    ports:
+      - 6379:6379
+
+  mysql:
+    image: mysql:latest
+    restart: unless-stopped
+    container_name: mysql
+    tty: true
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-laravel}
+      MYSQL_USER: ${MYSQL_USER:-laravel}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - ./mysql:/var/lib/mysql
+
+  phpmyadmin:
+    depends_on:
+      - mysql
+    container_name: phpmyadmin
+    image: 'phpmyadmin:latest'
+    restart: always
+    ports:
+      - "${PHPMYADMIN_PORT:-8081}:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: secret

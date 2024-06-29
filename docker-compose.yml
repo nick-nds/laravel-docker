@@ -1,0 +1,53 @@
+  
+services:
+  php82:
+    build:
+      context: ./php82
+      dockerfile: Dockerfile
+    container_name: php82
+    environment:
+      - XDEBUG_START_WITH_REQUEST=yes
+      - XDEBUG_DISCOVER_CLIENT_HOST=true
+      - XDEBUG_REMOTE_AUTOSTART=on
+    ports:
+      - 8001:8001
+    volumes:
+      - ./www/php82:/app
+
+  artisan:
+    build:
+      context: ./php82
+      dockerfile: Dockerfile
+    container_name: artisan
+    volumes:
+      - ./www/php82:/app
+    working_dir: /app/${PROJECT}/${BRANCH}
+    user: application
+    entrypoint: [ 'php', '/app/${PROJECT}/${BRANCH}/artisan' ]
+
+  composer:
+    build:
+      context: ./php82
+      dockerfile: Dockerfile
+    container_name: composer
+    volumes:
+      - ./www/php82:/app
+    working_dir: /app/${PROJECT}/${BRANCH}
+    user: application
+    entrypoint: [ 'composer', '--ignore-platform-reqs' ]
+
+
+  mailpit:
+    image: 'axllent/mailpit:latest'
+    container_name: mailpit
+    ports:
+      - "${MAILPIT_PORT_1:-1089}:1025"
+      - "${MAILPIT_PORT_2:-8089}:8025"
+
+  reverse:
+    build:
+      context: ./reverse
+      dockerfile: Dockerfile
+    container_name: reverse
+    ports:
+      - 443:443
