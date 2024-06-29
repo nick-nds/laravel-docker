@@ -2,6 +2,7 @@
 /tags*
 /mysql
 /www/php82/*
+!/www/php82/index.php
 /reverse/servers/*.test.conf
 /reverse/ssl/*.crt
 /reverse/ssl/*.key
