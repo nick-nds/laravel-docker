@@ -1,42 +1,24 @@
-  
 services:
-  php82:
-    build:
-      context: ./php82
-      dockerfile: Dockerfile
-    container_name: php82
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    container_name: redis
     ports:
-      - 8001:8001
-      - 8002:8002
+      - 6379:6379
+
+  mysql:
+    image: mysql:latest
+    restart: unless-stopped
+    container_name: mysql
+    tty: true
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-laravel}
+      MYSQL_USER: ${MYSQL_USER:-laravel}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
     volumes:
-      - ./www/php82:/app
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-
-  mailpit:
-    image: 'axllent/mailpit:latest'
-    container_name: mailpit
-    ports:
-      - "${MAILPIT_PORT_1:-1089}:1025"
-      - "${MAILPIT_PORT_2:-8089}:8025"
-
-  reverse:
-    build:
-      context: ./reverse
-      dockerfile: Dockerfile
-    container_name: reverse
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    ports:
-      - 443:443
-      - 80:80
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes: 
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+      - ./mysql:/var/lib/mysql
